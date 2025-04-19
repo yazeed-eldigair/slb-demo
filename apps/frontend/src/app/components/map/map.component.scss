@@ -1,0 +1,116 @@
+.map-container {
+  padding: 16px;
+}
+
+.filter-card {
+  margin-bottom: 24px;
+}
+
+.filter-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.map-content {
+  display: flex;
+  gap: 24px;
+}
+
+.map-card {
+  flex: 2;
+}
+
+.wells-card {
+  flex: 1;
+  min-width: 250px;
+  max-width: 350px;
+}
+
+.map {
+  height: 600px;
+  width: 100%;
+  border-radius: 4px;
+}
+
+.wells-list {
+  max-height: 560px;
+  overflow-y: auto;
+}
+
+.well-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.well-info {
+  flex: 1;
+}
+
+.well-name {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.well-region {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.well-status {
+  font-size: 0.8rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  display: inline-block;
+}
+
+.well-status.active {
+  background-color: #e6f7e6;
+  color: #2e7d32;
+}
+
+.well-status.inactive {
+  background-color: #fff8e1;
+  color: #ff8f00;
+}
+
+.well-status.abandoned {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.no-wells {
+  padding: 24px;
+  text-align: center;
+  color: #666;
+}
+
+@media (max-width: 992px) {
+  .map-content {
+    flex-direction: column;
+  }
+  
+  .wells-card {
+    max-width: none;
+  }
+  
+  .map {
+    height: 400px;
+  }
+  
+  .wells-list {
+    max-height: 300px;
+  }
+}

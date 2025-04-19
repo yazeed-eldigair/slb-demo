@@ -1,0 +1,32 @@
+<div class="chatbot-container">
+  <!-- Chat toggle button -->
+  <button mat-fab color="primary" class="chat-toggle" (click)="toggleChat()">
+    <mat-icon>{{ isOpen ? 'close' : 'chat' }}</mat-icon>
+  </button>
+
+  <!-- Chat window -->
+  <mat-card class="chat-window" [class.open]="isOpen">
+    <mat-card-header>
+      <mat-card-title>Oil Production Assistant</mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="messages-container">
+        <div *ngFor="let msg of messages" class="message" [class.user-message]="msg.isUser" [class.bot-message]="!msg.isUser">
+          {{ msg.text }}
+        </div>
+      </div>
+    </mat-card-content>
+    
+    <mat-card-actions>
+      <div class="input-container">
+        <mat-form-field appearance="outline" class="message-input">
+          <input matInput placeholder="Type a message..." [(ngModel)]="message" (keyup.enter)="sendMessage()">
+        </mat-form-field>
+        <button mat-icon-button color="primary" (click)="sendMessage()">
+          <mat-icon>send</mat-icon>
+        </button>
+      </div>
+    </mat-card-actions>
+  </mat-card>
+</div>

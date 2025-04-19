@@ -1,0 +1,107 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+.env
+.venv
+venv/
+ENV/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# SQLite database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Node.js / Angular
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.angular/
+.angular-cache/
+.sass-cache/
+connect.lock
+coverage/
+libpeerconnection.log
+testem.log
+typings/
+.npm
+.eslintcache
+.stylelintcache
+.node_repl_history
+
+# IDEs and editors
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build artifacts
+/dist
+/tmp
+/out-tsc
+
+# Miscellaneous
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+/typings
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Data directory (except keep the directory itself)
+/apps/backend/data/*.db
+/apps/backend/data/*.sqlite
+/apps/backend/data/*.sqlite3
+!/apps/backend/data/.gitkeep

@@ -1,0 +1,68 @@
+<div class="map-container">
+  <h1 class="mat-headline-4">Well Locations Map</h1>
+
+  <!-- Filter Card -->
+  <mat-card class="filter-card">
+    <mat-card-header>
+      <mat-card-title>Filter Wells</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="filter-form">
+        <mat-form-field appearance="outline">
+          <mat-label>Region</mat-label>
+          <mat-select [(ngModel)]="selectedRegion" (selectionChange)="filterByRegion()">
+            <mat-option value="">All Regions</mat-option>
+            <mat-option value="North Region">North Region</mat-option>
+            <mat-option value="South Region">South Region</mat-option>
+            <mat-option value="East Region">East Region</mat-option>
+            <mat-option value="West Region">West Region</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button mat-button color="primary" (click)="resetFilter()">Reset Filter</button>
+        <button mat-button color="primary" (click)="centerMap()">
+          <mat-icon>center_focus_strong</mat-icon> Center Map
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="loading-spinner">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <div class="map-content">
+    <!-- Map -->
+    <mat-card class="map-card">
+      <mat-card-content>
+        <div id="map" class="map"></div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Wells List -->
+    <mat-card class="wells-card">
+      <mat-card-header>
+        <mat-card-title>Wells ({{ filteredWells.length }})</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="wells-list">
+          <div *ngFor="let well of filteredWells" class="well-item">
+            <div class="well-info">
+              <div class="well-name">{{ well.name }}</div>
+              <div class="well-region">{{ well.region }}</div>
+              <div class="well-status" [ngClass]="well.status.toLowerCase()">{{ well.status }}</div>
+            </div>
+            <button mat-icon-button color="primary" (click)="zoomToWell(well)" matTooltip="Zoom to well">
+              <mat-icon>location_searching</mat-icon>
+            </button>
+          </div>
+          
+          <div *ngIf="filteredWells.length === 0" class="no-wells">
+            No wells found for the selected filter.
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

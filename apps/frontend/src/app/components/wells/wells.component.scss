@@ -1,0 +1,48 @@
+.wells-container {
+  padding: 16px;
+}
+
+.filter-card {
+  margin-bottom: 24px;
+}
+
+.filter-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.full-width {
+  width: 100%;
+}
+
+mat-chip {
+  color: white !important;
+  font-weight: 500;
+}
+
+.mat-column-status {
+  width: 120px;
+}
+
+.mat-column-coordinates {
+  width: 180px;
+}
+
+@media (max-width: 768px) {
+  .filter-form mat-form-field {
+    width: 100%;
+  }
+}

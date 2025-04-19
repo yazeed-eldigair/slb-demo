@@ -1,3 +1,5 @@
+import { Production } from "./production.model";
+
 export interface Well {
   id: number;
   name: string;

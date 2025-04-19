@@ -1,0 +1,55 @@
+.production-container {
+  padding: 16px;
+}
+
+.filter-card {
+  margin-bottom: 24px;
+}
+
+.filter-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.filter-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 8px;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+.production-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.chart-container {
+  height: 400px;
+  width: 100%;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.full-width {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .filter-form mat-form-field {
+    width: 100%;
+  }
+  
+  .chart-container {
+    height: 300px;
+  }
+}

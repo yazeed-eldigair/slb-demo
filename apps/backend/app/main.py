@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from contextlib import asynccontextmanager
 
 from .database.database import engine, Base
 from .database import crud, init_db
@@ -9,10 +10,17 @@ from .routers import wells, production
 # Create the database tables
 Base.metadata.create_all(bind=engine)
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Initialize the database with sample data if it's empty
+    init_db.initialize_database()
+    yield
+
 app = FastAPI(
     title="Oil Production API",
     description="API for oil production data visualization",
-    version="0.1.0"
+    version="0.1.0",
+    lifespan=lifespan
 )
 
 # Configure CORS
@@ -27,11 +35,6 @@ app.add_middleware(
 # Include routers
 app.include_router(wells.router, prefix="/api", tags=["wells"])
 app.include_router(production.router, prefix="/api", tags=["production"])
-
-@app.on_event("startup")
-async def startup_event():
-    # Initialize the database with sample data if it's empty
-    init_db.initialize_database()
 
 @app.get("/")
 async def root():
