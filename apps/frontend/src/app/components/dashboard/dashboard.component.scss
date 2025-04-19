@@ -49,6 +49,18 @@
   padding: 16px 0;
 }
 
+.charts-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.chart-card {
+  flex: 1 1 calc(50% - 12px);
+  min-width: 300px;
+}
+
 .chart-container {
   height: 400px;
   width: 100%;

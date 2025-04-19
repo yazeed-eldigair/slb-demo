@@ -45,6 +45,7 @@ def get_production_by_date_range(
     skip: int = 0, 
     limit: int = 100
 ):
+    # Start with a query for Production
     query = db.query(Production)
     
     # Apply date range filter if provided
@@ -55,13 +56,21 @@ def get_production_by_date_range(
     elif end_date:
         query = query.filter(Production.date <= end_date)
     
-    # Apply well name filter if provided
-    if well_name:
-        query = query.join(Well).filter(Well.name == well_name)
-    
-    # Apply region filter if provided
-    if region:
-        query = query.join(Well).filter(Well.region == region)
+    # Join the Well table only once, then apply both filters if needed
+    has_well_filters = well_name is not None or region is not None
+    if has_well_filters:
+        query = query.join(Well)
+        
+        # Build filters for well conditions
+        well_filters = []
+        if well_name:
+            well_filters.append(Well.name == well_name)
+        if region:
+            well_filters.append(Well.region == region)
+            
+        # Apply all well filters at once
+        if well_filters:
+            query = query.filter(and_(*well_filters))
     
     return query.offset(skip).limit(limit).all()
 

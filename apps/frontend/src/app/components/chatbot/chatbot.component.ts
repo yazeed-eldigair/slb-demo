@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -25,6 +25,7 @@ import { FormsModule } from '@angular/forms';
 export class ChatbotComponent implements OnInit {
   isOpen = false;
   message = '';
+  @ViewChild('chatContent') private chatContent!: ElementRef;
   messages: { text: string; isUser: boolean }[] = [];
 
   constructor() { }
@@ -36,6 +37,11 @@ export class ChatbotComponent implements OnInit {
 
   toggleChat(): void {
     this.isOpen = !this.isOpen;
+    
+    if (this.isOpen) {
+      // When opening chat, scroll to bottom after a short delay to ensure animation is complete
+      setTimeout(() => this.scrollToBottom(), 300);
+    }
   }
 
   sendMessage(): void {
@@ -58,10 +64,22 @@ export class ChatbotComponent implements OnInit {
 
   addUserMessage(text: string): void {
     this.messages.push({ text, isUser: true });
+    this.scrollToBottom();
   }
 
   addBotMessage(text: string): void {
     this.messages.push({ text, isUser: false });
+    this.scrollToBottom();
+  }
+  
+  private scrollToBottom(): void {
+    // Use setTimeout to ensure the DOM has been updated
+    setTimeout(() => {
+      if (this.chatContent) {
+        const element = this.chatContent.nativeElement;
+        element.scrollTop = element.scrollHeight;
+      }
+    }, 50);
   }
 
   getBotResponse(message: string): string {

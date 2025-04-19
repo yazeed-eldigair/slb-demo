@@ -42,12 +42,14 @@ Chart.register(...registerables);
 })
 export class DashboardComponent implements OnInit, AfterViewInit {
   @ViewChild('productionChart') productionChart!: ElementRef;
+  @ViewChild('regionPieChart') regionPieChart!: ElementRef;
 
   wells: Well[] = [];
   productions: any[] = [];
   filterForm!: FormGroup;
   isLoading = false;
   chart: any;
+  pieChart: any;
 
   constructor(
     private wellService: WellService,
@@ -62,9 +64,16 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // If data is already loaded, initialize the chart
-    if (this.productions.length > 0 && this.productionChart) {
-      setTimeout(() => this.initChart(), 100);
+    // If data is already loaded, initialize the charts
+    if (this.productions.length > 0) {
+      setTimeout(() => {
+        if (this.productionChart) {
+          this.initChart();
+        }
+        if (this.regionPieChart) {
+          this.initPieChart();
+        }
+      }, 300);
     }
   }
 
@@ -91,8 +100,15 @@ export class DashboardComponent implements OnInit, AfterViewInit {
             this.productions = productions;
             this.isLoading = false;
             
-            // Initialize chart with a longer delay to ensure the view is ready
-            setTimeout(() => this.initChart(), 300);
+            // Initialize charts with a delay to ensure the view is ready
+            setTimeout(() => {
+              if (this.productionChart) {
+                this.initChart();
+              }
+              if (this.regionPieChart) {
+                this.initPieChart();
+              }
+            }, 300);
           },
           error: (error) => {
             console.error('Error loading production data:', error);
@@ -127,9 +143,14 @@ export class DashboardComponent implements OnInit, AfterViewInit {
           this.chart = null;
         }
         
-        // Add a delay to ensure the DOM is ready before initializing the chart
+        // Add a delay to ensure the DOM is ready before initializing the charts
         setTimeout(() => {
-          this.initChart();
+          if (this.productionChart) {
+            this.initChart();
+          }
+          if (this.regionPieChart) {
+            this.initPieChart();
+          }
         }, 300);
       },
       error: (error) => {
@@ -222,6 +243,61 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     }
   }
 
+  initPieChart(): void {
+    if (this.regionPieChart && this.productions.length > 0) {
+      // Process data for pie chart
+      const pieData = this.processPieChartData();
+      const regions = pieData.regions;
+      const productionValues = pieData.productionValues;
+      const backgroundColors = pieData.backgroundColors;
+      
+      // Destroy existing pie chart if it exists
+      if (this.pieChart) {
+        this.pieChart.destroy();
+      }
+
+      // Create pie chart
+      const ctx = this.regionPieChart.nativeElement.getContext('2d');
+      this.pieChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: regions,
+          datasets: [{
+            data: productionValues,
+            backgroundColor: backgroundColors,
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'right',
+              labels: {
+                padding: 20,
+                font: {
+                  size: 12
+                }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const label = context.label || '';
+                  const value = context.raw as number;
+                  const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
+                  const percentage = Math.round((value / total) * 100);
+                  return `${label}: ${value.toFixed(2)} barrels (${percentage}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+  }
+  
   updateChart(): void {
     if (this.chart && this.productions.length > 0) {
       const chartData = this.processChartData();
@@ -230,6 +306,15 @@ export class DashboardComponent implements OnInit, AfterViewInit {
       this.chart.update();
     } else if (this.productions.length > 0) {
       this.initChart();
+    }
+    
+    if (this.pieChart && this.productions.length > 0) {
+      const pieData = this.processPieChartData();
+      this.pieChart.data.labels = pieData.regions;
+      this.pieChart.data.datasets[0].data = pieData.productionValues;
+      this.pieChart.update();
+    } else if (this.productions.length > 0 && this.regionPieChart) {
+      this.initPieChart();
     }
   }
 
@@ -278,6 +363,48 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     }
 
     return { dates, oilProduction };
+  }
+  
+  processPieChartData() {
+    // Check if we have production data
+    if (!this.productions || this.productions.length === 0) {
+      return { regions: [], productionValues: [], backgroundColors: [] };
+    }
+
+    // Group productions by region and sum oil production
+    const productionByRegion: {[key: string]: number} = {};
+    
+    // First, get all well IDs and their regions
+    const wellRegions: {[key: number]: string} = {};
+    this.wells.forEach(well => {
+      wellRegions[well.id] = well.region;
+    });
+    
+    // Group by region and sum oil production
+    this.productions.forEach(prod => {
+      const region = wellRegions[prod.well_id] || 'Unknown';
+      if (!productionByRegion[region]) {
+        productionByRegion[region] = 0;
+      }
+      productionByRegion[region] += prod.oil_production;
+    });
+    
+    // Extract regions and production values
+    const regions = Object.keys(productionByRegion);
+    const productionValues = Object.values(productionByRegion) as number[];
+    
+    // Generate colors for each region
+    const backgroundColors = [
+      'rgba(255, 99, 132, 0.7)',   // Red
+      'rgba(54, 162, 235, 0.7)',   // Blue
+      'rgba(255, 206, 86, 0.7)',   // Yellow
+      'rgba(75, 192, 192, 0.7)',   // Green
+      'rgba(153, 102, 255, 0.7)',  // Purple
+      'rgba(255, 159, 64, 0.7)',   // Orange
+      'rgba(199, 199, 199, 0.7)'   // Gray
+    ];
+    
+    return { regions, productionValues, backgroundColors };
   }
 
   navigateToWells(): void {

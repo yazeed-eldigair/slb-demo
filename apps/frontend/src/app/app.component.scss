@@ -14,6 +14,14 @@
   margin-left: 8px;
 }
 
+:host ::ng-deep .mdc-list-item__primary-text {
+  display: flex;
+}
+
+:host ::ng-deep .nav-label {
+  padding-top: 2px;
+}
+
 mat-toolbar {
   position: sticky;
   top: 0;

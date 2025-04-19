@@ -10,7 +10,7 @@
       <mat-card-title>Oil Production Assistant</mat-card-title>
     </mat-card-header>
     
-    <mat-card-content>
+    <mat-card-content #chatContent>
       <div class="messages-container">
         <div *ngFor="let msg of messages" class="message" [class.user-message]="msg.isUser" [class.bot-message]="!msg.isUser">
           {{ msg.text }}

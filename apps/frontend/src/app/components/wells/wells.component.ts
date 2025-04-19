@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { MatSortModule, MatSort } from '@angular/material/sort';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -38,7 +38,7 @@ import { Well } from '../../models/well.model';
   templateUrl: './wells.component.html',
   styleUrls: ['./wells.component.scss']
 })
-export class WellsComponent implements OnInit {
+export class WellsComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -50,7 +50,7 @@ export class WellsComponent implements OnInit {
 
   // Table configuration
   displayedColumns: string[] = ['id', 'name', 'region', 'status', 'coordinates'];
-  dataSource: any;
+  dataSource = new MatTableDataSource<Well>([]);
 
   // Available regions and statuses
   regions: string[] = [];
@@ -70,6 +70,14 @@ export class WellsComponent implements OnInit {
       this.applyFilters();
     });
   }
+  
+  ngAfterViewInit(): void {
+    // Connect the paginator and sort to the data source
+    setTimeout(() => {
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
+    });
+  }
 
   loadWells(): void {
     this.isLoading = true;
@@ -77,7 +85,15 @@ export class WellsComponent implements OnInit {
       next: (wells) => {
         this.wells = wells;
         this.filteredWells = wells;
-        this.dataSource = this.filteredWells;
+        this.dataSource = new MatTableDataSource(this.filteredWells);
+        
+        // Connect the paginator and sort to the data source
+        if (this.paginator) {
+          this.dataSource.paginator = this.paginator;
+        }
+        if (this.sort) {
+          this.dataSource.sort = this.sort;
+        }
         
         // Extract unique regions and statuses for filters
         this.regions = [...new Set(wells.map(well => well.region))];
@@ -106,14 +122,30 @@ export class WellsComponent implements OnInit {
     }
     
     this.filteredWells = filtered;
-    this.dataSource = this.filteredWells;
+    this.dataSource = new MatTableDataSource(this.filteredWells);
+    
+    // Maintain pagination and sorting when filters change
+    if (this.paginator) {
+      this.dataSource.paginator = this.paginator;
+    }
+    if (this.sort) {
+      this.dataSource.sort = this.sort;
+    }
   }
 
   resetFilters(): void {
     this.regionFilter.setValue('');
     this.statusFilter.setValue('');
     this.filteredWells = this.wells;
-    this.dataSource = this.filteredWells;
+    this.dataSource = new MatTableDataSource(this.filteredWells);
+    
+    // Maintain pagination and sorting when filters are reset
+    if (this.paginator) {
+      this.dataSource.paginator = this.paginator;
+    }
+    if (this.sort) {
+      this.dataSource.sort = this.sort;
+    }
   }
 
   applyTextFilter(event: Event): void {
@@ -136,7 +168,15 @@ export class WellsComponent implements OnInit {
       well.status.toLowerCase().includes(filterValue)
     );
     
-    this.dataSource = this.filteredWells;
+    this.dataSource = new MatTableDataSource(this.filteredWells);
+    
+    // Maintain pagination and sorting when text filter is applied
+    if (this.paginator) {
+      this.dataSource.paginator = this.paginator;
+    }
+    if (this.sort) {
+      this.dataSource.sort = this.sort;
+    }
   }
 
   getStatusColor(status: string): string {
