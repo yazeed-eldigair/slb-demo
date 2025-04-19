@@ -37,9 +37,9 @@ export class MapComponent implements OnInit, AfterViewInit {
   markers: any[] = [];
   selectedRegion = '';
   
-  // Map center (Texas, USA)
-  defaultCenter: L.LatLngExpression = [31.9686, -99.9018];
-  defaultZoom = 6;
+  // Map center (UAE)
+  defaultCenter: L.LatLngExpression = [24.4539, 54.3773]; // Abu Dhabi coordinates
+  defaultZoom = 8;
 
   constructor(private wellService: WellService) { }
 

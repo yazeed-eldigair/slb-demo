@@ -21,6 +21,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Architecture diagram documenting system design
 - Added favicon to the frontend application
 
+### Fixed
+- Resolved API redirect issues by updating frontend service URLs to include trailing slashes
+- Suppressed Node.js deprecation warnings in the Angular development server
+- Fixed production data filtering endpoint by ensuring consistent trailing slashes
+- Fixed pagination in wells and production tables by properly implementing Material Angular table data source
+
+### Changed
+- Updated sample well data to use UAE regions (Abu Dhabi, Dubai, Sharjah, etc.) with appropriate coordinates
+- Updated frontend components (dashboard, map, production) to use UAE regions in dropdowns
+- Reconfigured map component to center on UAE with appropriate zoom level
+
 ## [0.1.0] - 2025-04-19
 
 ### Added

@@ -7,7 +7,7 @@ import { Well } from '../models/well.model';
   providedIn: 'root'
 })
 export class WellService {
-  private apiUrl = '/api/wells';
+  private apiUrl = '/api/wells/';
 
   constructor(private http: HttpClient) { }
 
@@ -16,10 +16,10 @@ export class WellService {
   }
 
   getWell(id: number): Observable<Well> {
-    return this.http.get<Well>(`${this.apiUrl}/${id}`);
+    return this.http.get<Well>(`${this.apiUrl}${id}`);
   }
 
   getWellsByRegion(region: string): Observable<Well[]> {
-    return this.http.get<Well[]>(`${this.apiUrl}/region/${region}`);
+    return this.http.get<Well[]>(`${this.apiUrl}region/${region}`);
   }
 }

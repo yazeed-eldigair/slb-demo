@@ -1,7 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { MatSortModule, MatSort } from '@angular/material/sort';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -13,14 +13,11 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { ReactiveFormsModule, FormGroup, FormBuilder } from '@angular/forms';
-import { Chart, registerables } from 'chart.js';
+import { RouterModule } from '@angular/router';
 import { ProductionService } from '../../services/production.service';
 import { WellService } from '../../services/well.service';
 import { Production } from '../../models/production.model';
 import { Well } from '../../models/well.model';
-
-// Register Chart.js components
-Chart.register(...registerables);
 
 @Component({
   selector: 'app-production',
@@ -39,25 +36,22 @@ Chart.register(...registerables);
     MatDatepickerModule,
     MatNativeDateModule,
     MatSelectModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    RouterModule
   ],
   templateUrl: './production.component.html',
   styleUrls: ['./production.component.scss']
 })
-export class ProductionComponent implements OnInit {
+export class ProductionComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-  @ViewChild('productionChart') productionChart: any;
 
   productions: Production[] = [];
   wells: Well[] = [];
   filterForm!: FormGroup;
   isLoading = true;
-  chart: any;
-
-  // Table configuration
+  dataSource = new MatTableDataSource<any>();
   displayedColumns: string[] = ['date', 'well_id', 'oil_production', 'gas_production', 'water_production'];
-  dataSource: any;
 
   constructor(
     private productionService: ProductionService,
@@ -71,9 +65,8 @@ export class ProductionComponent implements OnInit {
   }
 
   ngAfterViewInit(): void {
-    if (this.productionChart && this.productions.length > 0) {
-      this.initChart();
-    }
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 
   initFilterForm(): void {
@@ -97,21 +90,8 @@ export class ProductionComponent implements OnInit {
         this.productionService.getProductions().subscribe({
           next: (productions) => {
             this.productions = productions;
-            this.dataSource = this.productions;
-            
-            if (this.paginator) {
-              this.dataSource.paginator = this.paginator;
-            }
-            
-            if (this.sort) {
-              this.dataSource.sort = this.sort;
-            }
-            
+            this.dataSource.data = this.productions;
             this.isLoading = false;
-            
-            if (this.productionChart) {
-              this.initChart();
-            }
           },
           error: (error) => {
             console.error('Error loading production data:', error);
@@ -138,18 +118,8 @@ export class ProductionComponent implements OnInit {
     this.productionService.filterProduction(filter).subscribe({
       next: (productions) => {
         this.productions = productions;
-        this.dataSource = this.productions;
-        
-        if (this.paginator) {
-          this.dataSource.paginator = this.paginator;
-        }
-        
-        if (this.sort) {
-          this.dataSource.sort = this.sort;
-        }
-        
+        this.dataSource.data = this.productions;
         this.isLoading = false;
-        this.updateChart();
       },
       error: (error) => {
         console.error('Error filtering production data:', error);
@@ -168,133 +138,5 @@ export class ProductionComponent implements OnInit {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
-  }
-
-  initChart(): void {
-    if (!this.productionChart || !this.productionChart.nativeElement) {
-      return;
-    }
-
-    const ctx = this.productionChart.nativeElement.getContext('2d');
-    if (!ctx) {
-      return;
-    }
-
-    // Process data for chart
-    const chartData = this.processChartData();
-
-    // Create chart using Chart.js
-    this.chart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: chartData.dates,
-        datasets: [
-          {
-            label: 'Oil Production (barrels)',
-            data: chartData.oilProduction,
-            borderColor: 'rgba(75, 192, 192, 1)',
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            tension: 0.1,
-            fill: true
-          },
-          {
-            label: 'Gas Production (cubic feet)',
-            data: chartData.gasProduction,
-            borderColor: 'rgba(255, 99, 132, 1)',
-            backgroundColor: 'rgba(255, 99, 132, 0.2)',
-            tension: 0.1,
-            fill: true
-          },
-          {
-            label: 'Water Production (barrels)',
-            data: chartData.waterProduction,
-            borderColor: 'rgba(54, 162, 235, 1)',
-            backgroundColor: 'rgba(54, 162, 235, 0.2)',
-            tension: 0.1,
-            fill: true
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          title: {
-            display: true,
-            text: 'Production Trends'
-          },
-          tooltip: {
-            mode: 'index',
-            intersect: false
-          }
-        },
-        scales: {
-          x: {
-            title: {
-              display: true,
-              text: 'Date'
-            }
-          },
-          y: {
-            title: {
-              display: true,
-              text: 'Production'
-            },
-            beginAtZero: true
-          }
-        }
-      }
-    });
-  }
-
-  updateChart(): void {
-    if (this.chart) {
-      const chartData = this.processChartData();
-      this.chart.data.labels = chartData.dates;
-      this.chart.data.datasets[0].data = chartData.oilProduction;
-      this.chart.data.datasets[1].data = chartData.gasProduction;
-      this.chart.data.datasets[2].data = chartData.waterProduction;
-      this.chart.update();
-    } else {
-      this.initChart();
-    }
-  }
-
-  processChartData() {
-    // Group by date
-    const productionByDate: any = {};
-    
-    this.productions.forEach(prod => {
-      const date = typeof prod.date === 'string' ? prod.date.split('T')[0] : prod.date;
-      
-      if (!productionByDate[date]) {
-        productionByDate[date] = {
-          oil: 0,
-          gas: 0,
-          water: 0,
-          count: 0
-        };
-      }
-      
-      productionByDate[date].oil += prod.oil_production;
-      productionByDate[date].gas += prod.gas_production;
-      productionByDate[date].water += prod.water_production;
-      productionByDate[date].count += 1;
-    });
-    
-    // Sort dates
-    const sortedDates = Object.keys(productionByDate).sort();
-    
-    // Calculate averages
-    const oilProduction = sortedDates.map(date => productionByDate[date].oil);
-    const gasProduction = sortedDates.map(date => productionByDate[date].gas);
-    const waterProduction = sortedDates.map(date => productionByDate[date].water);
-    
-    return {
-      dates: sortedDates,
-      oilProduction,
-      gasProduction,
-      waterProduction
-    };
   }
 }

@@ -2,9 +2,6 @@ import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angula
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTableModule } from '@angular/material/table';
-import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
-import { MatSortModule, MatSort } from '@angular/material/sort';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,7 +10,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatIconModule } from '@angular/material/icon';
 import { ReactiveFormsModule, FormGroup, FormBuilder } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Chart, registerables } from 'chart.js';
 import { WellService } from '../../services/well.service';
 import { ProductionService } from '../../services/production.service';
@@ -30,9 +27,6 @@ Chart.register(...registerables);
     CommonModule,
     MatCardModule,
     MatProgressSpinnerModule,
-    MatTableModule,
-    MatPaginatorModule,
-    MatSortModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
@@ -40,25 +34,20 @@ Chart.register(...registerables);
     MatDatepickerModule,
     MatNativeDateModule,
     MatIconModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    RouterModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit, AfterViewInit {
   @ViewChild('productionChart') productionChart!: ElementRef;
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild(MatSort) sort!: MatSort;
 
   wells: Well[] = [];
-  productions: Production[] = [];
+  productions: any[] = [];
   filterForm!: FormGroup;
-  isLoading = true;
+  isLoading = false;
   chart: any;
-
-  // Table configuration
-  displayedColumns: string[] = ['date', 'well_id', 'oil_production', 'gas_production', 'water_production'];
-  dataSource: any;
 
   constructor(
     private wellService: WellService,
@@ -73,7 +62,10 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    // Chart will be initialized after data is loaded
+    // If data is already loaded, initialize the chart
+    if (this.productions.length > 0 && this.productionChart) {
+      setTimeout(() => this.initChart(), 100);
+    }
   }
 
   initFilterForm(): void {
@@ -97,9 +89,10 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         this.productionService.getProductions().subscribe({
           next: (productions) => {
             this.productions = productions;
-            this.dataSource = this.productions.slice(0, 10); // Show only the first 10 records initially
             this.isLoading = false;
-            this.initChart();
+            
+            // Initialize chart with a longer delay to ensure the view is ready
+            setTimeout(() => this.initChart(), 300);
           },
           error: (error) => {
             console.error('Error loading production data:', error);
@@ -126,9 +119,18 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     this.productionService.filterProduction(filter).subscribe({
       next: (productions) => {
         this.productions = productions;
-        this.dataSource = this.productions.slice(0, 10);
         this.isLoading = false;
-        this.updateChart();
+        
+        // Destroy existing chart and create a new one with filtered data
+        if (this.chart) {
+          this.chart.destroy();
+          this.chart = null;
+        }
+        
+        // Add a delay to ensure the DOM is ready before initializing the chart
+        setTimeout(() => {
+          this.initChart();
+        }, 300);
       },
       error: (error) => {
         console.error('Error filtering production data:', error);
@@ -139,6 +141,15 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
   resetFilter(): void {
     this.filterForm.reset();
+    this.isLoading = true;
+    
+    // Destroy existing chart
+    if (this.chart) {
+      this.chart.destroy();
+      this.chart = null;
+    }
+    
+    // Load data again
     this.loadData();
   }
 
@@ -152,8 +163,14 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   initChart(): void {
     if (this.productionChart && this.productions.length > 0) {
       // Process data for chart
-      const dates = this.processChartData().dates;
-      const oilProduction = this.processChartData().oilProduction;
+      const chartData = this.processChartData();
+      const dates = chartData.dates;
+      const oilProduction = chartData.oilProduction;
+      
+      // Destroy existing chart if it exists
+      if (this.chart) {
+        this.chart.destroy();
+      }
 
       // Create chart
       const ctx = this.productionChart.nativeElement.getContext('2d');
@@ -217,6 +234,11 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   }
 
   processChartData() {
+    // Check if we have production data
+    if (!this.productions || this.productions.length === 0) {
+      return { dates: [], oilProduction: [] };
+    }
+
     // Sort productions by date
     const sortedProductions = [...this.productions].sort((a, b) => 
       new Date(a.date).getTime() - new Date(b.date).getTime()
@@ -224,17 +246,36 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
     // Group by date and sum oil production
     const productionByDate = sortedProductions.reduce((acc: any, curr) => {
-      const date = curr.date.split('T')[0]; // Remove time part if present
+      // Ensure date is properly formatted
+      const date = typeof curr.date === 'string' ? curr.date.split('T')[0] : '';
+      if (!date) return acc;
+      
       if (!acc[date]) {
         acc[date] = 0;
       }
-      acc[date] += curr.oil_production;
+      // Ensure oil_production is a number
+      const oilProduction = typeof curr.oil_production === 'number' ? curr.oil_production : 0;
+      acc[date] += oilProduction;
       return acc;
     }, {});
 
     // Extract dates and oil production values
     const dates = Object.keys(productionByDate);
-    const oilProduction = Object.values(productionByDate);
+    const oilProduction = Object.values(productionByDate) as number[];
+
+    // If we have too many dates, sample them to make the chart more readable
+    if (dates.length > 30) {
+      const step = Math.floor(dates.length / 30);
+      const sampledDates = [];
+      const sampledProduction = [];
+      
+      for (let i = 0; i < dates.length; i += step) {
+        sampledDates.push(dates[i]);
+        sampledProduction.push(oilProduction[i]);
+      }
+      
+      return { dates: sampledDates, oilProduction: sampledProduction };
+    }
 
     return { dates, oilProduction };
   }
