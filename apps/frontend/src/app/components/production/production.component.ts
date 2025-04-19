@@ -65,8 +65,32 @@ export class ProductionComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    // Initial setup of sorting and pagination
+    setTimeout(() => {
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
+      
+      // Set up custom sorting for date and numeric columns
+      this.dataSource.sortingDataAccessor = (item, property) => {
+        switch(property) {
+          case 'date': 
+            return new Date(item.date).getTime();
+          case 'oil_production':
+          case 'gas_production':
+          case 'water_production':
+            return Number(item[property]);
+          default: 
+            return item[property];
+        }
+      };
+      
+      // Set default sort to date descending
+      this.sort.sort({
+        id: 'date',
+        start: 'desc',
+        disableClear: false
+      });
+    });
   }
 
   initFilterForm(): void {
@@ -90,7 +114,28 @@ export class ProductionComponent implements OnInit, AfterViewInit {
         this.productionService.getProductions().subscribe({
           next: (productions) => {
             this.productions = productions;
-            this.dataSource.data = this.productions;
+            this.dataSource = new MatTableDataSource(this.productions);
+            
+            // Re-apply sorting and pagination after data changes
+            setTimeout(() => {
+              this.dataSource.sort = this.sort;
+              this.dataSource.paginator = this.paginator;
+              
+              // Set up custom sorting for date and numeric columns
+              this.dataSource.sortingDataAccessor = (item, property) => {
+                switch(property) {
+                  case 'date': 
+                    return new Date(item.date).getTime();
+                  case 'oil_production':
+                  case 'gas_production':
+                  case 'water_production':
+                    return Number(item[property]);
+                  default: 
+                    return item[property];
+                }
+              };
+            });
+            
             this.isLoading = false;
           },
           error: (error) => {
@@ -118,7 +163,28 @@ export class ProductionComponent implements OnInit, AfterViewInit {
     this.productionService.filterProduction(filter).subscribe({
       next: (productions) => {
         this.productions = productions;
-        this.dataSource.data = this.productions;
+        this.dataSource = new MatTableDataSource(this.productions);
+        
+        // Re-apply sorting and pagination after filtering
+        setTimeout(() => {
+          this.dataSource.sort = this.sort;
+          this.dataSource.paginator = this.paginator;
+          
+          // Set up custom sorting for date and numeric columns
+          this.dataSource.sortingDataAccessor = (item, property) => {
+            switch(property) {
+              case 'date': 
+                return new Date(item.date).getTime();
+              case 'oil_production':
+              case 'gas_production':
+              case 'water_production':
+                return Number(item[property]);
+              default: 
+                return item[property];
+            }
+          };
+        });
+        
         this.isLoading = false;
       },
       error: (error) => {
