@@ -1,0 +1,4 @@
+1. We should use Material Angular for all components (buttons, tables... etc)
+2. We should use Chart.js for charts
+3. Major changes to the code that involve new features and fixes should be added to the changelog.
+4. We should maintain the README

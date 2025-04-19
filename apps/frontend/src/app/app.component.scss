@@ -1,0 +1,35 @@
+.spacer {
+  flex: 1 1 auto;
+}
+
+.sidenav-container {
+  height: calc(100vh - 64px);
+}
+
+.sidenav {
+  width: 250px;
+}
+
+.nav-label {
+  margin-left: 8px;
+}
+
+mat-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.active {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.container {
+  padding: 20px;
+}
+
+@media (max-width: 599px) {
+  .sidenav-container {
+    height: calc(100vh - 56px);
+  }
+}

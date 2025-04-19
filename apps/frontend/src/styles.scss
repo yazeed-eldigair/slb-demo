@@ -1,0 +1,83 @@
+/* You can add global styles to this file, and also import other style files */
+html, body { height: 100%; }
+body { 
+  margin: 0; 
+  font-family: Roboto, "Helvetica Neue", sans-serif; 
+  background-color: #f5f5f5;
+}
+
+.container {
+  padding: 20px;
+}
+
+.mat-card {
+  margin-bottom: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.mat-card-title {
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.map-container {
+  height: 500px;
+  width: 100%;
+}
+
+.chart-container {
+  height: 400px;
+  width: 100%;
+}
+
+.flex-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.flex-item {
+  flex: 1 1 300px;
+}
+
+.mat-form-field {
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
+.filter-card {
+  margin-bottom: 20px;
+}
+
+.action-button {
+  margin-right: 8px;
+}
+
+.table-container {
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .flex-item {
+    flex: 1 1 100%;
+  }
+  
+  .map-container,
+  .chart-container {
+    height: 300px;
+  }
+}
