@@ -1,68 +1,39 @@
-# Oil Production Analytics Platform
+# [DEMO] Oil Production Dashboard
 
-A full-stack web application for visualizing and analyzing oil production data.
+A monorepo for interactive visualization of UAE's oil production data using Angular Material and Chart.js for the frontend and FastAPI for the backend.
 
-## Project Overview
 
-This application provides an interactive platform for analyzing oil production data with the following features:
-- Data visualization through charts and tables
-- Interactive map for well locations
-- Filtering capabilities based on various parameters
-- RESTful API for data retrieval
-
-## Technology Stack
-
-### Frontend
-- Angular 17
-- Material Angular for UI components
-- Chart.js for data visualization
-- Leaflet for interactive maps
-
-### Backend
-- Python with FastAPI
-- SQLite database
-- Docker for containerization
-
-## Project Structure
-
-```
-slb-demo/
-├── apps/
-│   ├── frontend/         # Angular application
-│   └── backend/          # FastAPI application
-│       ├── app/
-│       │   ├── database/ # Database setup and connections
-│       │   ├── models/   # Data models
-│       │   ├── routers/  # API endpoints
-│       │   └── services/ # Business logic
-├── shared/               # Shared configurations and utilities
-├── docker-compose.yml    # Docker Compose configuration
-└── README.md             # Project documentation
-```
+## Table of Contents
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Running with Docker](#running-with-docker)
+  - [Local Development](#local-development)
+- [Project Structure](#project-structure)
+- [Project Overview](#project-overview)
+- [Features](#features)
+- [System Architecture](#system-architecture)
+- [Technology Stack](#technology-stack)
+- [API Documentation](#api-documentation)
 
 ## Getting Started
 
 ### Prerequisites
-- Docker and Docker Compose
-- Node.js and npm (for local development)
-- Python 3.9+ (for local development)
+- Docker and Docker Compose (for containerized deployment)
+- Node.js 18+ and npm (for local frontend development)
+- Python 3.9+ (for local backend development)
 
 ### Running with Docker
-1. Clone the repository
+
+The easiest way to run the application is using Docker Compose:
+
+1. Start the application using Docker Compose
    ```bash
-   git clone <repository-url>
-   cd slb-demo
+   docker-compose up --build
    ```
 
-2. Start the application using Docker Compose
-   ```bash
-   docker-compose up
-   ```
-
-3. Access the application
+2. Access the application
    - Frontend: http://localhost:4200
    - Backend API: http://localhost:8000
-   - API Documentation: http://localhost:8000/docs
 
 ### Local Development
 
@@ -101,25 +72,62 @@ slb-demo/
 
 3. Run the development server
    ```bash
-   ng serve
+   npm run start
    ```
 
-## Features
+## Project Structure
 
-### Data Visualization
-- Line charts for oil production trends over time
-- Interactive tables for detailed data analysis
-- Map visualization for well locations
+```
+slb-demo/
+├── apps/
+│   ├── frontend/         # Angular application
+│   └── backend/          # FastAPI application
+├── docker-compose.yml    # Docker Compose configuration
+└── README.md             # Project documentation
+```
 
-### Data Filtering
-- Filter by date range
-- Filter by well name
-- Filter by region
+## System Architecture
 
-## API Documentation
+### Architecture Diagram
 
-The API documentation is available at `/docs` when the backend server is running.
+TODO: Add image
 
-## License
+### Component Descriptions
 
-[MIT License](LICENSE)
+#### Frontend (Angular)
+
+1. **Angular UI**: The main frontend application built with Angular 17.
+   - Provides user interface for data visualization and interaction
+   - Includes dashboard, wells listing, production data views, and map visualization
+
+2. **Material Angular UI**: UI component library providing consistent design elements.
+   - Used for all UI components as per project requirements
+   - Provides responsive design for various screen sizes
+
+3. **Chart.js Visualizations**: Library for creating interactive charts.
+   - Used for all data visualizations as per project requirements
+   - Includes line charts for oil production trends and pie charts for regional distribution
+
+#### Backend (FastAPI)
+
+1. **FastAPI Application**: Main backend application.
+   - Provides RESTful API endpoints for wells and production data
+   - Handles data processing and business logic
+   - Manages database operations through service layer
+
+2. **API Routes**:
+   - **/api/wells**: Endpoints for well data
+     - GET /api/wells/: List all wells
+     - GET /api/wells/{well_id}: Get specific well details
+   - **/api/production**: Endpoints for production data
+     - GET /api/production/: List all production records
+     - GET /api/production/{production_id}: Get specific production record
+     - POST /api/production/filter/: Filter production data by date, well, or region
+
+3. **Services & Data Models**:
+   - **Models**: SQLAlchemy ORM models for Well and Production data
+   - **Services**: Business logic for data processing and database operations
+   - **Database Initialization**: Sample data generation for testing
+
+4. **SQLite Database**: Persistent data storage.
+   - Stores well information and production data

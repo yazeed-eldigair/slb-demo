@@ -33,7 +33,7 @@ export class MapComponent implements OnInit, AfterViewInit {
   wells: Well[] = [];
   filteredWells: Well[] = [];
   isLoading = true;
-  map: any;
+  map!: L.Map;
   markers: any[] = [];
   selectedRegion = '';
   

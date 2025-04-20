@@ -18,8 +18,4 @@ export class WellService {
   getWell(id: number): Observable<Well> {
     return this.http.get<Well>(`${this.apiUrl}${id}`);
   }
-
-  getWellsByRegion(region: string): Observable<Well[]> {
-    return this.http.get<Well[]>(`${this.apiUrl}region/${region}`);
-  }
 }

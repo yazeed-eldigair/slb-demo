@@ -1,7 +1,6 @@
 from sqlalchemy.orm import Session
 from datetime import date, timedelta
 import random
-import os
 
 from ..models.models import Well, Production
 from .database import SessionLocal
@@ -90,17 +89,18 @@ def initialize_database():
         base_gas = random.uniform(1000, 5000)
         base_water = random.uniform(50, 200)
         
-        # Generate data for each day
+        # Generate data for each day with an increasing trend
         for day in range(30):
             current_date = start_date + timedelta(days=day)
             
-            # Add some daily variation
+            # Daily variation and growth factor
             daily_variation = random.uniform(0.8, 1.2)
+            growth_factor = 1 + (day * 0.08)
             
-            # Calculate production values with simple variation
-            oil_production = base_oil * daily_variation
-            gas_production = base_gas * daily_variation
-            water_production = base_water * daily_variation
+            # Calculate production values with variation and growth trend
+            oil_production = base_oil * daily_variation * growth_factor
+            gas_production = base_gas * daily_variation * growth_factor
+            water_production = base_water * daily_variation * growth_factor
             
             # Create production record for each day
             production = Production(

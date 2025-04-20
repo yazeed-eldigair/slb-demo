@@ -99,6 +99,13 @@ export class WellsComponent implements OnInit, AfterViewInit {
         this.regions = [...new Set(wells.map(well => well.region))];
         this.statuses = [...new Set(wells.map(well => well.status))];
         
+        // Ensure the data length is correctly set for pagination
+        setTimeout(() => {
+          if (this.paginator) {
+            this.paginator.length = this.filteredWells.length;
+          }
+        });
+        
         this.isLoading = false;
       },
       error: (error) => {
@@ -127,6 +134,8 @@ export class WellsComponent implements OnInit, AfterViewInit {
     // Maintain pagination and sorting when filters change
     if (this.paginator) {
       this.dataSource.paginator = this.paginator;
+      this.paginator.length = this.filteredWells.length;
+      this.paginator.firstPage(); // Reset to first page when filters change
     }
     if (this.sort) {
       this.dataSource.sort = this.sort;
@@ -142,6 +151,8 @@ export class WellsComponent implements OnInit, AfterViewInit {
     // Maintain pagination and sorting when filters are reset
     if (this.paginator) {
       this.dataSource.paginator = this.paginator;
+      this.paginator.length = this.filteredWells.length;
+      this.paginator.firstPage(); // Reset to first page when filters are reset
     }
     if (this.sort) {
       this.dataSource.sort = this.sort;
@@ -173,6 +184,8 @@ export class WellsComponent implements OnInit, AfterViewInit {
     // Maintain pagination and sorting when text filter is applied
     if (this.paginator) {
       this.dataSource.paginator = this.paginator;
+      this.paginator.length = this.filteredWells.length;
+      this.paginator.firstPage(); // Reset to first page when text filter is applied
     }
     if (this.sort) {
       this.dataSource.sort = this.sort;

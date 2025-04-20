@@ -10,9 +10,6 @@ class WellBase(BaseModel):
     longitude: float
     status: str
 
-class WellCreate(WellBase):
-    pass
-
 class Well(WellBase):
     id: int
 
@@ -26,22 +23,12 @@ class ProductionBase(BaseModel):
     gas_production: float
     water_production: float
 
-class ProductionCreate(ProductionBase):
-    well_id: int
-
 class Production(ProductionBase):
     id: int
     well_id: int
 
     class Config:
         orm_mode = True
-
-# Combined schemas for nested responses
-class WellWithProduction(Well):
-    productions: List[Production] = []
-
-class ProductionWithWell(Production):
-    well: Well
 
 # Filter schemas
 class ProductionFilter(BaseModel):

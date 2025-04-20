@@ -12,18 +12,14 @@ export class ProductionService {
   constructor(private http: HttpClient) { }
 
   getProductions(): Observable<Production[]> {
-    return this.http.get<Production[]>(this.apiUrl);
+    return this.http.get<Production[]>(`${this.apiUrl}?limit=1000`);
   }
 
   getProduction(id: number): Observable<Production> {
     return this.http.get<Production>(`${this.apiUrl}${id}`);
   }
 
-  getProductionByWell(wellId: number): Observable<Production[]> {
-    return this.http.get<Production[]>(`${this.apiUrl}well/${wellId}`);
-  }
-
   filterProduction(filter: ProductionFilter): Observable<Production[]> {
-    return this.http.post<Production[]>(`${this.apiUrl}filter/`, filter);
+    return this.http.post<Production[]>(`${this.apiUrl}filter/?limit=1000`, filter);
   }
 }
