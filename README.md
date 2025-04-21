@@ -9,11 +9,9 @@ A monorepo for interactive visualization of UAE's oil production data using Angu
   - [Running with Docker](#running-with-docker)
   - [Local Development](#local-development)
 - [Project Structure](#project-structure)
-- [Project Overview](#project-overview)
-- [Features](#features)
 - [System Architecture](#system-architecture)
-- [Technology Stack](#technology-stack)
-- [API Documentation](#api-documentation)
+   - [Architecture Diagram](#architecture-diagram)
+   - [Component Descriptions](#component-descriptions)
 
 ## Getting Started
 
